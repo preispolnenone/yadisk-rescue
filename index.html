@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Спасение Яндекс Диска</title>
+<meta name="description" content="Скачать файлы с Яндекс Диска на компьютер прямо из браузера. Ключ и файлы никуда, кроме Яндекса и вашего компьютера, не уходят.">
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #fff; --text: #1c1f24; --muted: #5d6673; --line: #dfe3e8;
+    --accent: #2b6cde; --accent-text: #fff; --ok: #1d7a3e; --bad: #b3261e; --warn-bg: #fff6dd; --warn-line: #e9c95c;
+    --bar: #e7ebf0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #15171b; --card: #1e2126; --text: #e6e8eb; --muted: #9aa3ae; --line: #343941;
+      --accent: #5b93f5; --accent-text: #0d1117; --ok: #5cc584; --bad: #f2867e; --warn-bg: #3a3120; --warn-line: #8a7230;
+      --bar: #2c3138;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #15171b; --card: #1e2126; --text: #e6e8eb; --muted: #9aa3ae; --line: #343941;
+    --accent: #5b93f5; --accent-text: #0d1117; --ok: #5cc584; --bad: #f2867e; --warn-bg: #3a3120; --warn-line: #8a7230;
+    --bar: #2c3138;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  .lead { color: var(--muted); margin: 0 0 20px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+  h2 { font-size: 16px; margin: 0 0 10px; }
+  .muted { color: var(--muted); font-size: 14px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .row > input[type=password], .row > input[type=text] { flex: 1 1 240px; }
+  input[type=password], input[type=text], textarea {
+    font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; width: 100%;
+  }
+  textarea { min-height: 52px; resize: vertical; }
+  button { font: inherit; border-radius: 6px; padding: 7px 14px; border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+  button:disabled { opacity: .45; cursor: default; }
+  label.check { display: inline-flex; gap: 6px; align-items: center; margin-right: 16px; }
+  details summary { cursor: pointer; color: var(--muted); font-size: 14px; margin-top: 8px; }
+  .status { margin-top: 8px; font-size: 14px; }
+  .status.ok { color: var(--ok); } .status.bad { color: var(--bad); }
+  .warn { background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  progress { width: 100%; height: 10px; appearance: none; border: 0; border-radius: 5px; background: var(--bar); overflow: hidden; }
+  progress::-webkit-progress-bar { background: var(--bar); }
+  progress::-webkit-progress-value { background: var(--accent); }
+  progress::-moz-progress-bar { background: var(--accent); }
+  .stats { font-weight: 600; margin: 10px 0 8px; font-variant-numeric: tabular-nums; }
+  #log { font: 12.5px/1.45 ui-monospace, Consolas, monospace; background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+         padding: 8px 10px; height: 220px; overflow: auto; white-space: pre-wrap; word-break: break-word; margin: 0; }
+  #log .bad { color: var(--bad); }
+  .tree-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin: 12px 0 6px; }
+  button.small { padding: 3px 10px; font-size: 13px; }
+  #tree { border: 1px solid var(--line); border-radius: 6px; max-height: 420px; overflow: auto; padding: 4px 0; background: var(--bg); }
+  #tree > p { margin: 8px 12px; }
+  .node { display: flex; align-items: center; gap: 6px; padding: 3px 10px 3px 0; min-height: 30px; }
+  .node:hover { background: var(--card); }
+  .node .tw { width: 22px; flex: none; text-align: center; color: var(--muted); cursor: pointer; user-select: none; border: 0; background: none; padding: 0; }
+  .node .tw.leaf { cursor: default; visibility: hidden; }
+  .node label { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; cursor: pointer; }
+  .node .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .node .meta { color: var(--muted); font-size: 13px; white-space: nowrap; margin-left: auto; padding-left: 10px; font-variant-numeric: tabular-nums; }
+  .node .meta .have { color: var(--ok); }
+  .loading { display: flex; gap: 10px; align-items: center; background: var(--warn-bg); border: 1px solid var(--warn-line);
+             border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; }
+  .spinner { width: 16px; height: 16px; flex: none; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--accent);
+             animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .opt { margin: 0 0 12px; }
+  .opt label.check { display: flex; gap: 8px; align-items: baseline; margin: 0 0 2px; }
+  .opt .hint { color: var(--muted); font-size: 13.5px; margin-left: 24px; }
+  .opt.sub { margin: -4px 0 12px 24px; }
+  .summary { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin: 4px 0 12px; }
+  .summary h2 { margin-bottom: 6px; }
+  .summary table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  .summary td { padding: 3px 0; border-bottom: 1px solid var(--line); white-space: pre; }
+  .summary td:last-child { text-align: right; font-weight: 600; white-space: nowrap; padding-left: 12px; }
+  .summary p { margin: 8px 0 0; }
+  .donate { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+            margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+  a.btn { display: inline-block; text-decoration: none; border-radius: 6px; padding: 7px 16px; font-weight: 600;
+          background: var(--accent); color: var(--accent-text); }
+  footer { color: var(--muted); font-size: 13px; margin-top: 18px; }
+  code { font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Спасение Яндекс Диска</h1>
+  <p class="lead">Скачивает файлы с вашего Диска в папку на компьютере, сохраняя структуру папок. Всё работает в вашем браузере: ключ доступа и файлы идут только между Яндексом и вашим компьютером.</p>
+
+  <div class="warn" id="unsupported" hidden>
+    Этот браузер не умеет сохранять файлы в выбранную папку. Откройте страницу в <b>Google Chrome</b> на компьютере.
+  </div>
+
+  <section>
+    <h2>1. Вход</h2>
+    <div class="row" id="oauthRow" hidden>
+      <button class="primary" id="btnLogin">Войти через Яндекс</button>
+      <span class="muted">Яндекс спросит разрешение только на чтение Диска.</span>
+    </div>
+    <details id="manual">
+      <summary>Вставить ключ доступа вручную</summary>
+      <p class="muted">Откройте <a href="https://yandex.ru/dev/disk/poligon/" target="_blank" rel="noopener">страницу Яндекса</a>, войдите в свой аккаунт, нажмите «Получить OAuth-токен» и вставьте строку сюда. Ключ даёт доступ к вашему Диску — никому его не пересылайте.</p>
+      <div class="row">
+        <input type="password" id="token" placeholder="Ключ доступа" autocomplete="off" spellcheck="false">
+        <button id="btnCheck">Проверить</button>
+      </div>
+      <label class="check" style="margin-top:8px"><input type="checkbox" id="remember"> Запомнить в этом браузере</label>
+    </details>
+    <div class="status" id="account"></div>
+  </section>
+
+  <section>
+    <h2>2. Куда сохранить</h2>
+    <div class="row">
+      <button id="btnFolder">Выбрать папку…</button>
+      <span id="folderName" class="muted">Папка не выбрана</span>
+    </div>
+    <p class="muted" style="margin:8px 0 0">Если в папке уже лежит часть файлов Диска (например, копия папки синхронизации), они не будут скачиваться повторно.</p>
+  </section>
+
+  <section>
+    <h2>3. Что скачать</h2>
+    <div>
+      <label class="check"><input type="checkbox" class="kind" value="image" checked> Фото</label>
+      <label class="check"><input type="checkbox" class="kind" value="video" checked> Видео</label>
+      <label class="check"><input type="checkbox" class="kind" value="other"> Остальные файлы</label>
+    </div>
+    <div class="tree-head">
+      <span class="muted">Папки Диска — снимите галочки с ненужных:</span>
+      <span class="row">
+        <button class="small" id="btnAll">Выбрать все</button>
+        <button class="small" id="btnNone">Снять все</button>
+        <button class="small" id="btnRefresh" title="Получить список файлов с Диска заново">Обновить список</button>
+      </span>
+    </div>
+    <div class="loading" id="treeStatus" hidden><span class="spinner"></span><span id="treeStatusText"></span></div>
+    <div id="tree"><p class="muted">Войдите (шаг 1) — после этого здесь появится список папок вашего Диска.</p></div>
+    <div class="stats" id="selected"></div>
+  </section>
+
+  <section>
+    <h2>4. Если файл не скачивается</h2>
+    <div class="opt" id="optCopies">
+      <label class="check"><input type="checkbox" id="copies" checked> Сохранять уменьшенную копию фото, если оригинал недоступен</label>
+      <div class="hint">У большинства фото существует уменьшенная копия. Копия до 1280 px — хватит для просмотра, но не для печати. Если оригинал позже станет доступен, он скачается. У видео копий нет.</div>
+    </div>
+    <div class="opt sub" id="optPlace">
+      <div>Куда класть копии:</div>
+      <label class="check"><input type="radio" name="place" value="separate" checked> В отдельную папку «_Уменьшенные копии»</label>
+      <label class="check"><input type="radio" name="place" value="beside"> Рядом с оригиналом</label>
+      <div class="hint">Имя копии — <code>фото (уменьшенная копия).jpg</code>.</div>
+    </div>
+    <div class="opt" id="optPatient">
+      <label class="check"><input type="checkbox" id="patient" checked> Ещё раз попробовать видео и большие файлы, которые не скачались</label>
+      <div class="hint">Видео и файлы больше 20 МБ часто не скачиваются из-за перебоев у Яндекса. Вторая попытка идёт медленнее, но вероятность скачать больше.</div>
+    </div>
+    <div class="actions">
+      <button class="primary" id="btnDownload">Скачать</button>
+      <button id="btnStop" disabled>Стоп</button>
+    </div>
+    <progress id="progress" value="0" max="1" hidden></progress>
+    <div class="stats" id="stats"></div>
+    <div class="summary" id="summary" hidden></div>
+    <pre id="log" hidden></pre>
+    <p class="muted" style="margin:10px 0 0">Не всё скачалось? Нажмите «Скачать» ещё раз позже — уже скачанное пропускается. Нескачанное записывается в файл <code>failed.csv</code> в выбранной папке. Не закрывайте вкладку, пока идёт скачивание.</p>
+  </section>
+
+  <footer>Работает напрямую с API Яндекс Диска. Исходный код страницы целиком виден в браузере.</footer>
+</main>
+
+<script>
+"use strict";
+// --- настройки
+const CLIENT_ID = "";            // id приложения с oauth.yandex.ru; пусто — только ручной ввод ключа
+const API = "https://cloud-api.yandex.net/v1/disk";
+const PAGE = 1000;
+// подобрано на аварии октября 2026: дольше ждать недоступный файл почти не помогает, больше потоков — больше отказов
+const WORKERS = 6, RETRIES = 1, TIMEOUT_S = 30;
+const STALL_S = 90;                  // пауза посреди уже идущего скачивания
+const MAX_RESUMES = 5;               // докачек после обрыва на один файл
+const PATIENT_S = 120, PATIENT_WORKERS = 2, BIG_BYTES = 20e6;  // второй круг для видео и больших файлов
+const COPY_DIR = "_Уменьшенные копии";
+const DONATE_URL = "https://pay.cloudtips.ru/p/47f2f753";  // добровольная поддержка; пусто — блок не показывается
+
+class AuthError extends Error {}
+
+const $ = (id) => document.getElementById(id);
+const state = { token: "", root: null, running: false, stopCtrl: null, mode: "",
+                all: [], tree: null, rootFiles: null, off: new Set(), expanded: new Set(), counted: false,
+                listing: false, listedAt: 0, compareCtrl: null, opts: null };
+
+// --- оформление
+
+function gb(n) { return n >= 1e8 ? (n / 1e9).toFixed(2) + " ГБ" : Math.round(n / 1e6) + " МБ"; }
+function show(path) { return path.replace(/^disk:\//, ""); }
+
+function log(text, bad = false) {
+  const box = $("log");
+  const line = document.createElement("div");
+  if (bad) line.className = "bad";
+  line.textContent = text;
+  box.append(line);
+  while (box.childElementCount > 1500) box.firstChild.remove();
+  box.scrollTop = box.scrollHeight;
+}
+
+function setStatus(text, cls = "") { const a = $("account"); a.textContent = text; a.className = "status " + cls; }
+
+function busy(on) {
+  state.running = on;
+  for (const id of ["btnDownload", "btnFolder", "btnCheck", "btnLogin", "btnRefresh"]) $(id).disabled = on || (state.listing && id !== "btnFolder");
+  $("btnStop").disabled = !on;
+}
+
+// --- сеть
+
+function sleep(ms, signal) {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(resolve, ms);
+    signal?.addEventListener("abort", () => { clearTimeout(t); reject(signal.reason); }, { once: true });
+  });
+}
+
+async function api(method, params, { signal, retries = 5 } = {}) {
+  const url = API + (method ? "/" + method : "") + "?" + new URLSearchParams(params);
+  for (let attempt = 1; ; attempt++) {
+    let resp;
+    try {
+      resp = await fetch(url, { headers: { Authorization: "OAuth " + state.token }, signal });
+    } catch (e) {
+      if (signal?.aborted || attempt >= retries) throw e;
+      await sleep(Math.min(2 ** attempt, 30) * 1000, signal);
+      continue;
+    }
+    if (resp.ok) return resp.json();
+    if (resp.status === 401 || resp.status === 403) throw new AuthError("Яндекс не принял ключ");
+    // 404 и прочие 4xx повторять бессмысленно
+    if ((resp.status < 500 && resp.status !== 429) || attempt >= retries) throw new Error("HTTP " + resp.status);
+    await sleep(Math.min(2 ** attempt, 30) * 1000, signal);
+  }
+}
+
+// Таймаут «сервер молчит N секунд»: сбрасывается каждой порцией данных, большой файл не обрывается.
+function idleGuard(ms, outer) {
+  const ctrl = new AbortController();
+  let timer, timedOut = false;
+  const setIdle = (v) => { ms = v; kick(); };
+  const kick = () => { clearTimeout(timer); timer = setTimeout(() => { timedOut = true; ctrl.abort(); }, ms); };
+  const onOuter = () => ctrl.abort();
+  outer.addEventListener("abort", onOuter, { once: true });
+  kick();
+  return {
+    signal: ctrl.signal, kick, setIdle,
+    get seconds() { return Math.round(ms / 1000); },
+    done() { clearTimeout(timer); outer.removeEventListener("abort", onOuter); },
+    get timedOut() { return timedOut; },
+  };
+}
+
+async function listFiles(signal, onProgress) {
+  const items = [];
+  for (let offset = 0; ; ) {
+    const params = { limit: PAGE, offset, fields: "items.path,items.name,items.size,items.media_type,items.preview",
+                     preview_size: "XXXL", preview_crop: "false" };
+    const page = (await api("resources/files", params, { signal })).items;
+    if (!page.length) break;
+    items.push(...page);
+    offset += page.length;
+    onProgress?.(items.length);
+  }
+  // API отдаёт неполные страницы — на случай перекрытия убираем повторы по пути
+  const unique = [...new Map(items.map((i) => [i.path, i])).values()];
+  if (unique.length !== items.length) log(`Повторов в списке от Яндекса: ${items.length - unique.length} (убраны)`);
+  return unique;
+}
+
+function kindOf(item) { return item.media_type === "image" || item.media_type === "video" ? item.media_type : "other"; }
+
+function folderOf(path) { return path.slice(0, path.lastIndexOf("/")); }  // "disk:" для файлов в корне
+function kinds() { return [...document.querySelectorAll(".kind:checked")].map((c) => c.value); }
+function ofKinds(items) { const k = kinds(); return items.filter((i) => k.includes(kindOf(i))); }
+function select(items) { return ofKinds(items).filter((i) => !state.off.has(folderOf(i.path))); }
+
+// --- дерево папок
+// Галочка папки относится к файлам, лежащим прямо в ней; клик по папке ставит/снимает её и все вложенные.
+// Снятые папки хранятся списком путей, так что новые папки на Диске по умолчанию выбраны.
+
+function loadOff() { try { return new Set(JSON.parse(localStorage.getItem("yr_off") || "[]")); } catch { return new Set(); } }
+function saveOff() { try { localStorage.setItem("yr_off", JSON.stringify([...state.off])); } catch {} }
+
+function newNode(name, path) { return { name, path, children: new Map(), own: 0, count: 0, bytes: 0, have: 0 }; }
+
+function buildTree() {
+  const root = newNode("Диск", "disk:");
+  for (const item of ofKinds(state.all)) {
+    let node = root, path = "disk:";
+    for (const seg of folderOf(item.path).replace(/^disk:\/?/, "").split("/").filter(Boolean)) {
+      path += "/" + seg;
+      if (!node.children.has(seg)) node.children.set(seg, newNode(seg, path));
+      node = node.children.get(seg);
+    }
+    node.own++;
+  }
+  const byFolder = new Map();
+  for (const item of ofKinds(state.all)) {
+    const f = folderOf(item.path);
+    if (!byFolder.has(f)) byFolder.set(f, { count: 0, bytes: 0, have: 0 });
+    const a = byFolder.get(f);
+    a.count++; a.bytes += item.size || 0; if (item._have) a.have++;
+  }
+  (function sum(node) {
+    Object.assign(node, byFolder.get(node.path) || { count: 0, bytes: 0, have: 0 });
+    for (const c of node.children.values()) {
+      sum(c);
+      node.count += c.count; node.bytes += c.bytes; node.have += c.have;
+    }
+  })(root);
+  state.tree = root;
+}
+
+function nodeState(node) {  // "on" | "off" | "mixed"
+  let on = false, off = false;
+  if (node.own) state.off.has(node.path) ? (off = true) : (on = true);
+  for (const c of node.children.values()) {
+    const st = nodeState(c);
+    if (st !== "off") on = true;
+    if (st !== "on") off = true;
+    if (on && off) return "mixed";
+  }
+  return on && off ? "mixed" : on ? "on" : "off";
+}
+
+function setNode(node, on) {
+  if (node.own) on ? state.off.delete(node.path) : state.off.add(node.path);
+  for (const c of node.children.values()) setNode(c, on);
+}
+
+function sortedChildren(node) {
+  return [...node.children.values()].sort((a, b) => a.name.localeCompare(b.name, "ru", { numeric: true }));
+}
+
+function nodeRow(node, depth, label) {
+  const row = document.createElement("div");
+  row.className = "node";
+  row.style.paddingLeft = depth * 18 + 6 + "px";
+  const tw = document.createElement("button");
+  tw.type = "button";
+  tw.className = "tw" + (node.children.size ? "" : " leaf");
+  tw.textContent = node.children.size ? "▸" : "";
+  const box = document.createElement("input");
+  box.type = "checkbox";
+  const lab = document.createElement("label");
+  const nm = document.createElement("span");
+  nm.className = "nm";
+  nm.textContent = label || node.name;
+  nm.title = show(node.path) || "корень Диска";
+  const meta = document.createElement("span");
+  meta.className = "meta";
+  meta.textContent = `${node.count} · ${gb(node.bytes)}`;
+  if (state.counted) {
+    const h = document.createElement("span");
+    h.className = "have";
+    h.textContent = ` · уже скачано ${node.have}`;
+    meta.append(h);
+  }
+  lab.append(box, nm);
+  row.append(tw, lab, meta);
+  node.box = box;
+  box.onchange = () => { setNode(node, box.checked); saveOff(); refreshChecks(); };
+
+  let kids = null;
+  const open = (on) => {
+    tw.textContent = on ? "▾" : "▸";
+    if (on) {
+      state.expanded.add(node.path);
+      kids = document.createElement("div");
+      for (const c of sortedChildren(node)) kids.append(nodeRow(c, depth + 1));
+      row.after(kids);
+      refreshChecks();
+    } else {
+      state.expanded.delete(node.path);
+      kids?.remove();
+      kids = null;
+    }
+  };
+  if (node.children.size) {
+    tw.onclick = () => open(!kids);
+    // восстановить раскрытие после перерисовки — когда строка уже в документе
+    if (state.expanded.has(node.path)) queueMicrotask(() => open(true));
+  }
+  return row;
+}
+
+function renderTree() {
+  const box = $("tree");
+  box.textContent = "";
+  const root = state.tree;
+  state.rootFiles = null;
+  if (!root || !root.count) {
+    box.innerHTML = '<p class="muted">Нет файлов выбранных типов.</p>';
+    refreshChecks();
+    return;
+  }
+  // файлы прямо в корне Диска — отдельной строкой без вложенных папок
+  if (root.own) {
+    const pseudo = newNode("", "disk:");
+    pseudo.own = root.own;
+    for (const i of ofKinds(state.all)) {
+      if (folderOf(i.path) !== "disk:") continue;
+      pseudo.count++; pseudo.bytes += i.size || 0; if (i._have) pseudo.have++;
+    }
+    state.rootFiles = pseudo;
+    box.append(nodeRow(pseudo, 0, "Файлы в корне Диска"));
+  }
+  for (const c of sortedChildren(root)) box.append(nodeRow(c, 0));
+  refreshChecks();
+}
+
+function refreshChecks() {
+  const paint = (node) => {
+    if (node.box?.isConnected) {
+      const st = nodeState(node);
+      node.box.checked = st === "on";
+      node.box.indeterminate = st === "mixed";
+    }
+  };
+  const walk = (node) => { paint(node); for (const c of node.children.values()) walk(c); };
+  if (state.tree) walk(state.tree);
+  if (state.rootFiles) paint(state.rootFiles);
+
+  const sel = select(state.all);
+  const bytes = sel.reduce((s, i) => s + (i.size || 0), 0);
+  const have = sel.filter((i) => i._have);
+  const haveBytes = have.reduce((s, i) => s + (i.size || 0), 0);
+  $("selected").textContent = state.all.length
+    ? `Выбрано: ${sel.length} файлов, ${gb(bytes)}` +
+      (state.counted ? ` · уже скачано ${have.length} · осталось скачать ${sel.length - have.length} (${gb(bytes - haveBytes)})` : "")
+    : "";
+}
+
+function treeStatus(text) {
+  $("treeStatus").hidden = !text;
+  $("treeStatusText").textContent = text || "";
+}
+
+const LIST_TTL = 30 * 60 * 1000;  // старше — получаем список заново перед скачиванием
+
+function setListing(on) {
+  state.listing = on;
+  for (const id of ["btnDownload", "btnRefresh"]) $(id).disabled = on || state.running;
+}
+
+async function fetchList(signal) {
+  const say = (n) => treeStatus(`Получаю список файлов с Диска: ${n.toLocaleString("ru")}… ` +
+    "Это может занять минуту. Когда список загрузится, здесь появятся папки — снимите галочки с ненужных.");
+  say(0);
+  try {
+    state.all = await listFiles(signal, say);
+    state.listedAt = Date.now();
+    state.counted = false;
+  } finally {
+    treeStatus("");
+  }
+}
+
+async function loadTree() {
+  if (state.listing || state.running) return;
+  state.compareCtrl?.abort();
+  setListing(true);
+  $("tree").textContent = "";
+  try {
+    await fetchList();
+    buildTree();
+    renderTree();
+  } catch (e) {
+    const p = document.createElement("p");
+    p.className = "muted";
+    p.textContent = "Не удалось получить список: " + (e.message || e) + ". Нажмите «Обновить список».";
+    $("tree").append(p);
+    return;
+  } finally {
+    setListing(false);
+  }
+  compareLocal();
+}
+
+// Отмечает, какие файлы уже лежат в выбранной папке, — для «есть N» в дереве и итога «осталось скачать».
+async function compareLocal() {
+  if (!state.root || !state.all.length || state.running) return;
+  if (await state.root.queryPermission({ mode: "readwrite" }) !== "granted") return;
+  state.compareCtrl?.abort();
+  const ctrl = state.compareCtrl = new AbortController();
+  dirCache = new Map();
+  const pool = ofKinds(state.all);
+  let n = 0;
+  for (const i of pool) {
+    if (ctrl.signal.aborted) return;
+    i._have = await hasLocal(i);
+    if (++n % 200 === 0) treeStatus(`Сверяю с папкой на компьютере: ${n.toLocaleString("ru")} из ${pool.length.toLocaleString("ru")}…`);
+  }
+  treeStatus("");
+  state.counted = true;
+  buildTree();
+  renderTree();
+}
+
+// --- папка на компьютере
+
+const BAD_CHARS = /[<>:"\\|?*\x00-\x1f]/g;
+// Windows не допускает часть символов и хвостовые точки/пробелы в именах; остальные системы — тем более
+function parts(diskPath) { return show(diskPath).split("/").map((p) => p.replace(BAD_CHARS, "_").replace(/[. ]+$/, "") || "_"); }
+
+let dirCache = new Map();
+function getDir(names, create) {
+  const key = (create ? "w:" : "r:") + names.join("/");
+  if (!dirCache.has(key)) {
+    dirCache.set(key, (async () => {
+      let d = state.root;
+      for (const n of names) {
+        try { d = await d.getDirectoryHandle(n, { create }); }
+        catch (e) { if (!create && (e.name === "NotFoundError" || e.name === "TypeMismatchError")) return null; throw e; }
+      }
+      return d;
+    })());
+  }
+  return dirCache.get(key);
+}
+
+async function localSize(names) {
+  const dir = await getDir(names.slice(0, -1), false);
+  if (!dir) return null;
+  try { return (await (await dir.getFileHandle(names.at(-1))).getFile()).size; }
+  catch { return null; }
+}
+
+async function hasLocal(item) {
+  const size = await localSize(parts(item.path));
+  return size !== null && (item.size == null || size === item.size);
+}
+
+// Пишет поток в файл; при ошибке не оставляет пустых или обрезанных файлов.
+async function saveStream(names, resp, guard, expected) {
+  const dir = await getDir(names.slice(0, -1), true);
+  const name = names.at(-1);
+  let existed = true;
+  try { await dir.getFileHandle(name); } catch { existed = false; }
+  const fh = await dir.getFileHandle(name, { create: true });
+  const w = await fh.createWritable();  // пишет во временный файл, подменяет оригинал только при close()
+  try {
+    const reader = resp.body.getReader();
+    let got = 0;
+    for (;;) {
+      guard.kick();
+      const { done, value } = await reader.read();
+      if (done) break;
+      got += value.length;
+      await w.write(value);
+    }
+    if (expected != null && got !== expected) throw new Error(`размер ${got} вместо ${expected}`);
+    if (got === 0 && expected == null) throw new Error("пустой ответ");
+    await w.close();
+  } catch (e) {
+    await w.abort().catch(() => {});
+    if (!existed) await dir.removeEntry(name).catch(() => {});
+    throw e;
+  }
+}
+
+async function writeText(name, text) {
+  const fh = await state.root.getFileHandle(name, { create: true });
+  const w = await fh.createWritable();
+  await w.write(text);
+  await w.close();
+}
+
+// --- один файл
+
+// Имя копии: «фото (уменьшенная копия).jpg»; у не-jpg оригинала в скобках его тип,
+// чтобы IMG_1.heic и IMG_1.jpg из одной папки не дали одинаковые имена.
+function copyName(name) {
+  const m = name.match(/^(.+?)(\.[^.]+)?$/);
+  const stem = m[1], ext = (m[2] || "").toLowerCase();
+  if (!ext || ext === ".jpg" || ext === ".jpeg") return `${stem} (уменьшенная копия).jpg`;
+  return `${stem} (${ext.slice(1)}, уменьшенная копия).jpg`;
+}
+
+// Где лежит копия: рядом с оригиналом или в отдельной папке. Ищем в обоих местах, сохраняем — в выбранное.
+function copyNames(item, place) {
+  const p = parts(item.path);
+  p[p.length - 1] = copyName(p[p.length - 1]);
+  return place === "separate" ? [COPY_DIR, ...p] : p;
+}
+
+async function hasCopy(item) {
+  return await localSize(copyNames(item, "beside")) !== null || await localSize(copyNames(item, "separate")) !== null;
+}
+
+function failText(g, e) { return g.timedOut ? `сервер не ответил за ${g.seconds} с` : (e.message || String(e)); }
+
+// Оригинал. headerS — сколько ждать начала ответа; когда данные пошли, допускаем паузы до STALL_S.
+// Если поток оборвался на середине, докачиваем с места обрыва (сервер Яндекса поддерживает Range),
+// а не начинаем большой файл заново.
+async function fetchOriginal(item, headerS = TIMEOUT_S) {
+  const stop = state.stopCtrl.signal;
+  const names = parts(item.path);
+  const dir = await getDir(names.slice(0, -1), true);
+  const name = names.at(-1);
+  let existed = true;
+  try { await dir.getFileHandle(name); } catch { existed = false; }
+  let w = null, got = 0, fails = 0, resumes = 0, error = "";
+  try {
+    for (;;) {
+      const before = got;
+      const g = idleGuard(headerS * 1000, stop);
+      try {
+        const { href } = await api("resources/download", { path: item.path }, { signal: g.signal, retries: 2 });
+        g.kick();
+        // ссылка уже подписана — ключ на сервер скачивания не отправляем;
+        // с Referer сервер скачивания отвечает 403 без разрешения CORS — браузер видит «Failed to fetch»
+        const resp = await fetch(href, { signal: g.signal, referrerPolicy: "no-referrer",
+                                         headers: got ? { Range: `bytes=${got}-` } : {} });
+        if (got ? resp.status !== 206 : !resp.ok) throw new Error("HTTP " + resp.status);
+        // createWritable пишет во временный файл и подменяет оригинал только при close()
+        w ??= await (await dir.getFileHandle(name, { create: true })).createWritable();
+        g.setIdle(STALL_S * 1000);
+        const reader = resp.body.getReader();
+        for (;;) {
+          g.kick();
+          const { done, value } = await reader.read();
+          if (done) break;
+          got += value.length;
+          await w.write(value);
+        }
+        if (item.size != null && got !== item.size) throw new Error(`размер ${got} вместо ${item.size}`);
+        await w.close();
+        w = null;
+        return ["ok", resumes];
+      } catch (e) {
+        if (e instanceof AuthError) throw e;
+        if (stop.aborted) return ["stopped"];
+        error = failText(g, e);
+        const progressed = got > before && (item.size == null || got < item.size);
+        if (progressed ? ++resumes > MAX_RESUMES : ++fails >= RETRIES) break;
+      } finally {
+        g.done();
+      }
+    }
+  } finally {
+    if (w) {
+      await w.abort().catch(() => {});
+      if (!existed) await dir.removeEntry(name).catch(() => {});
+    }
+  }
+  return ["fail", got ? `${error} (получено ${gb(got)} из ${gb(item.size || 0)})` : error];
+}
+
+async function fetchCopy(item, place) {
+  const stop = state.stopCtrl.signal;
+  if (!item.preview) return ["fail", "нет уменьшенной копии"];
+  const g = idleGuard(TIMEOUT_S * 1000, stop);
+  try {
+    // ссылки на уменьшенные копии, в отличие от ссылок на оригинал, требуют ключ
+    const resp = await fetch(item.preview, { headers: { Authorization: "OAuth " + state.token },
+                                             signal: g.signal, referrerPolicy: "no-referrer" });
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    await saveStream(copyNames(item, place), resp, g, null);
+    return ["ok"];
+  } catch (e) {
+    if (stop.aborted) return ["stopped"];
+    return ["fail", failText(g, e)];
+  } finally {
+    g.done();
+  }
+}
+
+// Итог по файлу: orig — ok | skip | fail | stopped; prev — то же для уменьшенной копии (нет — копию не пробовали).
+async function processItem(item, opts) {
+  if (state.stopCtrl.signal.aborted) return { orig: "stopped" };
+  if (await hasLocal(item)) return { orig: "skip" };
+  const r = {};
+  const [st, x] = await fetchOriginal(item);
+  r.orig = st;
+  if (st === "fail") r.error = x;
+  if (st === "ok" && x) r.resumed = true;
+  if (st !== "fail") return r;
+  // копии только для фото: у видео Яндекс отдаёт один кадр, а не уменьшенное видео
+  if (opts.copies && kindOf(item) === "image") {
+    if (await hasCopy(item)) r.prev = "skip";
+    else {
+      const [st, err] = await fetchCopy(item, opts.place);
+      r.prev = st;
+      if (err) r.prevError = err;
+    }
+  }
+  return r;
+}
+
+// --- проход
+
+function options() {
+  return { copies: $("copies").checked, place: document.querySelector("input[name=place]:checked").value,
+           patient: $("patient").checked };
+}
+
+async function run() {
+  const opts = options();
+  if (!state.token) { alert("Сначала войдите или вставьте ключ (шаг 1)."); return; }
+  if (!state.root) { alert("Выберите папку, куда сохранить файлы (шаг 2)."); return; }
+  if (!document.querySelector(".kind:checked")) { alert("Отметьте, что скачать: фото, видео или остальные файлы."); return; }
+  if (state.all.length && !select(state.all).length) { alert("Не выбрано ни одной папки."); return; }
+  if (!(await ensurePermission())) return;
+
+  state.compareCtrl?.abort();
+  treeStatus("");
+  state.opts = opts;
+  state.stopCtrl = new AbortController();
+  dirCache = new Map();
+  busy(true);
+  $("summary").hidden = true;
+  $("progress").hidden = $("log").hidden = false;  // до первого запуска не показываем пустой журнал
+  const lock = await navigator.wakeLock?.request("screen").catch(() => null);
+  $("progress").value = 0;
+  $("stats").textContent = "";
+  log(opts.copies ? "=== Скачивание: оригиналы, при недоступности — уменьшенные копии ===" : "=== Скачивание: только оригиналы ===");
+
+  try {
+    // список с Диска переиспользуем, пока он свежий: ссылки на скачивание всё равно запрашиваются для каждого файла
+    if (!state.all.length || Date.now() - state.listedAt > LIST_TTL) {
+      log("Список файлов устарел — получаю заново.");
+      await fetchList(state.stopCtrl.signal);
+      buildTree(); renderTree();
+    }
+    const items = select(state.all);
+    const total = items.reduce((s, i) => s + (i.size || 0), 0);
+    log(`Выбрано: ${items.length} файлов, ${gb(total)} (всего на Диске ${state.all.length})`);
+    await processAll(items, opts);
+    buildTree(); renderTree();
+  } catch (e) {
+    if (e instanceof AuthError) { log("Яндекс не принял ключ. Войдите заново.", true); setStatus("✗ Ключ не подошёл", "bad"); }
+    else if (!state.stopCtrl.signal.aborted) log("Ошибка: " + (e.message || e) + ". Попробуйте ещё раз через несколько минут.", true);
+    else log("Остановлено.");
+  } finally {
+    lock?.release().catch(() => {});
+    busy(false);
+  }
+}
+
+function isBig(item) { return kindOf(item) === "video" || (item.size || 0) >= BIG_BYTES; }
+
+function tally(res, opts) {
+  const c = { origOk: 0, origBytes: 0, second: 0, resumed: 0, origSkip: 0, origFail: 0,
+              prevOk: 0, prevSkip: 0, prevFail: 0, noCopy: 0, stopped: 0 };
+  for (const [item, r] of res) {
+    if (r.orig === "ok") { c.origOk++; c.origBytes += item.size || 0; if (r.second) c.second++; if (r.resumed) c.resumed++; continue; }
+    if (r.orig === "skip") { c.origSkip++; continue; }
+    if (r.orig === "stopped" || r.prev === "stopped") { c.stopped++; continue; }
+    if (r.orig === "fail") { c.origFail++; if (!r.prev) c.noCopy++; }
+    if (r.prev === "ok") c.prevOk++;
+    if (r.prev === "skip") c.prevSkip++;
+    if (r.prev === "fail") c.prevFail++;
+  }
+  return c;
+}
+
+async function processAll(items, opts) {
+  const res = new Map();
+  const stop = state.stopCtrl.signal;
+  let authError = null, round = { name: "", list: items, done: 0 }, lastPaint = 0;
+  const COPY = { ok: "сохранена", skip: "уже была", fail: "недоступна", stopped: "остановлено" };
+
+  const failedRows = () => {
+    const rows = [];
+    for (const [item, r] of res) {
+      if (r.orig !== "fail") continue;
+      const copy = r.prev ? COPY[r.prev] : kindOf(item) === "image" && !opts.copies ? "не запрашивалась" : "не бывает";
+      rows.push([item.path, item.size ?? "", (r.error || "").replace(/;/g, ","), copy, r.at].join(";"));
+    }
+    return rows;
+  };
+  const report = () => writeText("failed.csv", "﻿path;size;error;reduced_copy;checked_at\n" + failedRows().join("\n") + "\n");
+
+  const paint = (force) => {
+    const now = performance.now();
+    if (!force && now - lastPaint < 200) return;
+    lastPaint = now;
+    const c = tally(res, opts);
+    $("progress").max = round.list.length;
+    $("progress").value = round.done;
+    const p = [`${round.name}Обработано ${round.done} из ${round.list.length}`];
+    p.push(`скачано ${c.origOk} (${gb(c.origBytes)})`);
+    if (opts.copies) p.push(`уменьшенных копий ${c.prevOk}`);
+    p.push(`уже было ${c.origSkip}`, `не удалось ${c.origFail}`);
+    $("stats").textContent = p.join(" · ");
+  };
+
+  async function pool(list, workers, fn) {
+    let next = 0, failsSinceReport = 0;
+    async function worker() {
+      while (next < list.length && !authError) {
+        const item = list[next++];
+        try { await fn(item); }
+        catch (e) {
+          if (e instanceof AuthError) { authError = e; state.stopCtrl.abort(); return; }
+          res.set(item, { orig: "fail", error: e.message || String(e) });
+        }
+        const r = res.get(item);
+        r.at = new Date().toISOString().slice(0, 19);
+        if (r.orig === "fail" && ++failsSinceReport >= 25) { failsSinceReport = 0; await report().catch(() => {}); }
+        round.done++;
+        paint(false);
+      }
+    }
+    await Promise.all(Array.from({ length: workers }, worker));
+  }
+
+  // круг 1: всё выбранное
+  await pool(items, WORKERS, async (item) => {
+    const r = await processItem(item, opts);
+    res.set(item, r);
+    if (r.orig === "ok" || r.orig === "skip") item._have = true;
+    if (r.orig === "ok" && kindOf(item) === "video") log(`Скачано видео: ${show(item.path)} (${gb(item.size || 0)})`);
+    if (r.orig === "fail") {
+      log(r.prev === "ok" ? `Оригинал недоступен, сохранена уменьшенная копия: ${show(item.path)}`
+        : r.prev === "skip" ? `Оригинал по-прежнему недоступен (уменьшенная копия уже есть): ${show(item.path)}`
+        : `Не скачан: ${show(item.path)} — ${r.error}` + (r.prev === "fail" ? "; уменьшенная копия тоже недоступна" : ""),
+        r.prev !== "ok" && r.prev !== "skip");
+    }
+  });
+
+  // круг 2: видео и большие файлы ещё раз, с долгим ожиданием и в меньше потоков
+  if (opts.patient && !stop.aborted && !authError) {
+    const big = items.filter((i) => res.get(i)?.orig === "fail" && isBig(i));
+    if (big.length) {
+      log(`Второй круг: ${big.length} видео и больших файлов, жду ответа сервера до ${PATIENT_S} с…`);
+      round = { name: "Второй круг (видео и большие файлы): ", list: big, done: 0 };
+      await pool(big, PATIENT_WORKERS, async (item) => {
+        const [st, x] = await fetchOriginal(item, PATIENT_S);
+        const r = res.get(item);
+        if (st === "ok") {
+          Object.assign(r, { orig: "ok", second: true, resumed: !!x });
+          item._have = true;
+          log(`Докачано во втором круге: ${show(item.path)} (${gb(item.size || 0)})`);
+        } else if (st === "fail") r.error = x;
+      });
+    }
+  }
+  paint(true);
+  await report().catch((e) => log("Не удалось записать failed.csv: " + e.message, true));
+  if (authError) throw authError;
+  showSummary(tally(res, opts), opts, items.length, failedRows().length);
+}
+
+function showSummary(c, opts, total, failedCount) {
+  const stopped = state.stopCtrl.signal.aborted;
+  const rows = [["Файлов в проходе", total]];
+  rows.push(["Оригиналов скачано", `${c.origOk} (${gb(c.origBytes)})`]);
+  if (c.second) rows.push(["  — из них со второй попытки", c.second]);
+  if (c.resumed) rows.push(["  — докачано после обрыва", c.resumed]);
+  rows.push(["Уже были скачаны раньше", c.origSkip], ["Оригинал недоступен", c.origFail]);
+  if (opts.copies) {
+    rows.push(["  — из них сохранена уменьшенная копия", c.prevOk], ["  — уменьшенная копия уже была", c.prevSkip],
+              ["  — уменьшенная копия тоже недоступна", c.prevFail]);
+    if (c.noCopy) rows.push(["  — видео и прочие файлы (копий не бывает)", c.noCopy]);
+  }
+  if (stopped) rows.push(["Не дошли из-за остановки", c.stopped]);
+  const box = $("summary");
+  box.textContent = "";
+  const h = document.createElement("h2");
+  h.textContent = stopped ? "Итог (остановлено)" : "Итог";
+  const table = document.createElement("table");
+  for (const [k, v] of rows) {
+    const tr = table.insertRow();
+    tr.insertCell().textContent = k;
+    tr.insertCell().textContent = v;
+  }
+  box.append(h, table);
+  if (failedCount) {
+    const p = document.createElement("p");
+    p.className = "muted";
+    p.textContent = `Список нескачанного (${failedCount}) — в файле failed.csv в выбранной папке. ` +
+      "Нажмите «Скачать» ещё раз позже — докачается только недостающее. Если оригинал станет доступен, он скачается, а уменьшенная копия останется.";
+    box.append(p);
+  }
+  // просьба о поддержке — только в итоге, когда человек уже видит результат
+  if (DONATE_URL && c.origOk + c.prevOk > 0) {
+    const d = document.createElement("div");
+    d.className = "donate";
+    const t = document.createElement("span");
+    t.textContent = "Утилита помогла? Её можно поддержать любой суммой — это добровольно.";
+    const a = document.createElement("a");
+    a.href = DONATE_URL;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.className = "btn";
+    a.textContent = "Поддержать";
+    d.append(t, a);
+    box.append(d);
+  }
+  box.hidden = false;
+  log(rows.map(([k, v]) => `${k.trim()}: ${v}`).join("; "));
+}
+
+// --- вход и папка
+
+async function checkToken() {
+  setStatus("Проверяю…");
+  try {
+    const d = await api("", { fields: "total_space,used_space,user.display_name,user.login" }, { retries: 2 });
+    setStatus(`✓ Вы вошли как ${d.user?.display_name || d.user?.login || "?"}. Занято ${gb(d.used_space)} из ${gb(d.total_space)}`, "ok");
+    if (!state.running) loadTree();
+    return true;
+  } catch (e) {
+    setStatus(e instanceof AuthError ? "✗ Ключ не подошёл. Получите новый и вставьте снова." : "✗ Не удалось связаться с Яндексом: " + e.message, "bad");
+    return false;
+  }
+}
+
+function useToken(token, remember) {
+  state.token = token.trim();
+  try {
+    if (remember) localStorage.setItem("yr_token", state.token); else localStorage.removeItem("yr_token");
+  } catch {}
+  return checkToken();
+}
+
+async function ensurePermission() {
+  const opts = { mode: "readwrite" };
+  if (await state.root.queryPermission(opts) === "granted") return true;
+  if (await state.root.requestPermission(opts) === "granted") return true;
+  alert("Без разрешения на запись в папку скачать не получится.");
+  return false;
+}
+
+async function pickFolder() {
+  try {
+    state.root = await window.showDirectoryPicker({ id: "yadisk-rescue", mode: "readwrite" });
+    $("folderName").textContent = "Папка: " + state.root.name;
+    $("folderName").className = "";
+    state.counted = false;
+    for (const i of state.all) delete i._have;
+    if (state.all.length) { buildTree(); renderTree(); compareLocal(); }
+  } catch (e) {
+    if (e.name !== "AbortError") alert("Не удалось открыть папку: " + e.message);
+  }
+}
+
+function init() {
+  state.off = loadOff();
+  if (!window.showDirectoryPicker) { $("unsupported").hidden = false; $("btnFolder").disabled = true; }
+  if (CLIENT_ID) $("oauthRow").hidden = false; else $("manual").open = true;
+
+  $("btnLogin").onclick = () => {
+    const redirect = location.origin + location.pathname;
+    location.href = "https://oauth.yandex.ru/authorize?" +
+      new URLSearchParams({ response_type: "token", client_id: CLIENT_ID, redirect_uri: redirect });
+  };
+  $("btnCheck").onclick = () => $("token").value.trim() ? useToken($("token").value, $("remember").checked) : alert("Вставьте ключ.");
+  $("token").addEventListener("input", () => setStatus(""));
+  $("btnFolder").onclick = pickFolder;
+  document.querySelectorAll(".kind").forEach((c) => c.addEventListener("change", () => {
+    buildTree(); renderTree();
+    if (!state.counted) compareLocal();
+  }));
+  $("btnAll").onclick = () => { state.off.clear(); saveOff(); refreshChecks(); };
+  $("btnNone").onclick = () => { if (state.tree) { setNode(state.tree, false); saveOff(); refreshChecks(); } };
+  $("btnRefresh").onclick = loadTree;
+  $("btnDownload").onclick = run;
+  // настройки шага 4 запоминаем
+  // место для копий нужно, только если копии сохраняются
+  const syncOpts = () => { $("optPlace").hidden = !$("copies").checked; };
+  for (const id of ["copies", "patient"]) {
+    try { const v = localStorage.getItem("yr_" + id); if (v !== null) $(id).checked = v === "1"; } catch {}
+    $(id).addEventListener("change", () => {
+      try { localStorage.setItem("yr_" + id, $(id).checked ? "1" : "0"); } catch {}
+      syncOpts();
+    });
+  }
+  try {
+    const v = localStorage.getItem("yr_place");
+    const el = v && document.querySelector(`input[name=place][value=${v}]`);
+    if (el) el.checked = true;
+  } catch {}
+  document.querySelectorAll("input[name=place]").forEach((r) => r.addEventListener("change", () => {
+    try { localStorage.setItem("yr_place", r.value); } catch {}
+  }));
+  syncOpts();
+  $("btnStop").onclick = () => { state.stopCtrl?.abort(); log("Останавливаю…"); };
+  window.addEventListener("beforeunload", (e) => { if (state.running) e.preventDefault(); });
+
+  // возврат со страницы входа Яндекса: #access_token=...
+  const hash = new URLSearchParams(location.hash.slice(1));
+  if (hash.get("access_token")) {
+    history.replaceState(null, "", location.pathname + location.search);
+    useToken(hash.get("access_token"), true);
+    return;
+  }
+  let saved = "";
+  try { saved = localStorage.getItem("yr_token") || ""; } catch {}
+  if (saved) { $("remember").checked = true; useToken(saved, true); }
+}
+
+init();
+window.rescue = { state, run, listFiles, hasLocal, loadTree, compareLocal };  // для проверки из консоли
+</script>
+</body>
+</html>
