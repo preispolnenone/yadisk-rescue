@@ -95,6 +95,7 @@
 <main>
   <h1>Спасение Яндекс Диска</h1>
   <p class="lead">Скачивает файлы с вашего Диска в папку на компьютере, сохраняя структуру папок. Всё работает в вашем браузере: ключ доступа и файлы идут только между Яндексом и вашим компьютером.</p>
+  <p class="muted">Настоящий адрес страницы — только <b>preispolnenone.github.io/yadisk-rescue</b>. Не вводите ключ на копиях по другим адресам.</p>
 
   <div class="warn" id="unsupported" hidden>
     Этот браузер не умеет сохранять файлы в выбранную папку. Откройте страницу в <b>Google Chrome</b> на компьютере.
@@ -171,7 +172,7 @@
     <div class="stats" id="stats"></div>
     <div class="summary" id="summary" hidden></div>
     <pre id="log" hidden></pre>
-    <p class="muted" style="margin:10px 0 0">Не всё скачалось? Нажмите «Скачать» ещё раз позже — уже скачанное пропускается. Нескачанное записывается в файл <code>failed.csv</code> в выбранной папке. Не закрывайте вкладку, пока идёт скачивание.</p>
+    <p class="muted" style="margin:10px 0 0">Не всё скачалось? Часть файлов на серверах Яндекса сейчас недоступна. Некоторые из них со временем снова начинают скачиваться, другие — нет, и заранее это не узнать. Можно нажать «Скачать» ещё раз через несколько часов: уже скачанное пропускается, пробуются только недостающие файлы. Их список — в файле <code>failed.csv</code> в выбранной папке. Не закрывайте вкладку, пока идёт скачивание.</p>
   </section>
 
   <footer>Работает напрямую с API Яндекс Диска. Исходный код страницы целиком виден в браузере.</footer>
@@ -278,9 +279,7 @@ async function listFiles(signal, onProgress) {
     onProgress?.(items.length);
   }
   // API отдаёт неполные страницы — на случай перекрытия убираем повторы по пути
-  const unique = [...new Map(items.map((i) => [i.path, i])).values()];
-  if (unique.length !== items.length) log(`Повторов в списке от Яндекса: ${items.length - unique.length} (убраны)`);
-  return unique;
+  return [...new Map(items.map((i) => [i.path, i])).values()];
 }
 
 function kindOf(item) { return item.media_type === "image" || item.media_type === "video" ? item.media_type : "other"; }
@@ -895,7 +894,7 @@ function showSummary(c, opts, total, failedCount) {
     const d = document.createElement("div");
     d.className = "donate";
     const t = document.createElement("span");
-    t.textContent = "Утилита помогла? Её можно поддержать любой суммой — это добровольно.";
+    t.textContent = "Утилита помогла? Можете поддержать меня любой суммой — это добровольно.";
     const a = document.createElement("a");
     a.href = DONATE_URL;
     a.target = "_blank";
